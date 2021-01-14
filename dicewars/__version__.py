@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Copyright 2021 Thomas Schott
+# Copyright (C) 2021 Thomas Schott <scotty@c-base.org>
 #
 # This file is part of dicewars.
 #
@@ -18,5 +18,5 @@
 # You should have received a copy of the GNU General Public License
 # along with dicewars.  If not, see <http://www.gnu.org/licenses/>.
 
-VERSION = (0, 1, 0, 'dev1')
+VERSION = (0, 1, 0, 'dev2')
 __version__ = '.'.join(str(v) for v in VERSION)

@@ -21,7 +21,7 @@ PACKAGES = find_packages()
 setup(
     name=NAME,
     version=VERSION,
-    description='Extended Python clone of https://www.gamedesign.jp/games/dicewars/ (backend)',
+    description='Backend for DiceWars games',
     author='Thomas Schott',
     author_email='scotty@c-base.org',
     python_requires='>=3.7',
