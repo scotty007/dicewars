@@ -133,7 +133,8 @@ class Grid:
 
 
 class _Cell:
-    _POINTS = ((2, 0), (4, 1), (4, 3), (2, 4), (0, 3), (0, 1))  # TODO: counter-clockwise for frontend rendering?
+    # border points (counter-clockwise, 5x5 raster, starting at top center)
+    _POINTS = ((2, 0), (0, 1), (0, 3), (2, 4), (4, 3), (4, 1))
 
     def __init__(self, idx, grid_width):
         self.idx = idx
@@ -146,21 +147,21 @@ class _Cell:
         self.border = tuple((x0 + x, y0 + y) for (x, y) in self._POINTS)
 
     def init(self, cells, grid_width, grid_height):
-        # find neighbor cells
+        # find neighbor cells (counter-clockwise)
         dx = self.grid_y % 2
         for dir_ in range(6):
-            if dir_ == 0:  # upper right
-                x, y = self.grid_x + dx, self.grid_y - 1
-            elif dir_ == 1:  # right
-                x, y = self.grid_x + 1, self.grid_y
-            elif dir_ == 2:  # lower right
-                x, y = self.grid_x + dx, self.grid_y + 1
-            elif dir_ == 3:  # lower left
-                x, y = self.grid_x + dx - 1, self.grid_y + 1
-            elif dir_ == 4:  # left
-                x, y = self.grid_x - 1, self.grid_y
-            else:  # upper left
+            if dir_ == 0:  # upper left
                 x, y = self.grid_x + dx - 1, self.grid_y - 1
+            elif dir_ == 1:  # left
+                x, y = self.grid_x - 1, self.grid_y
+            elif dir_ == 2:  # lower left
+                x, y = self.grid_x + dx - 1, self.grid_y + 1
+            elif dir_ == 3:  # lower right
+                x, y = self.grid_x + dx, self.grid_y + 1
+            elif dir_ == 4:  # right
+                x, y = self.grid_x + 1, self.grid_y
+            else:  # upper right
+                x, y = self.grid_x + dx, self.grid_y - 1
             if 0 <= x < grid_width and 0 <= y < grid_height:
                 self.neighbors[dir_] = cells[y * grid_width + x]
 
@@ -171,7 +172,7 @@ class _Area:
         self.cells = []
         self.neighbors = []
         self.center_cell = None
-        self.border = []  # TODO: counter-clockwise for frontend rendering?
+        self.border = []  # counter-clockwise
 
     def init(self, areas):
         assert self.cells
@@ -199,7 +200,7 @@ class _Area:
                 dist_min = dist
                 self.center_cell = cell
 
-        # find border points
+        # find border points (counter-clockwise)
         assert start_edge
         cell, dir_ = start_edge
         while True:
