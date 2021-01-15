@@ -22,8 +22,8 @@ import random
 from collections import namedtuple
 
 
-Cell = namedtuple('Cell', 'grid_x grid_y area border')
-Area = namedtuple('Area', 'cells neighbors center border')
+Cell = namedtuple('Cell', 'idx grid_x grid_y area border bbox')
+Area = namedtuple('Area', 'idx cells neighbors center border bbox')
 
 
 class Grid:
@@ -102,11 +102,11 @@ class Grid:
         else:
             map_w = max(c[0] for c in cells[-1].border)
         self._map_size = (map_w, max(c[1] for c in cells[-1].border))
-        self._cells = tuple(Cell(c.grid_x, c.grid_y, c.area_idx, c.border) for c in cells)
-        self._areas = tuple(
-            Area(tuple(c.idx for c in a.cells), tuple(n.idx for n in a.neighbors), a.center_cell.idx, a.border)
-            for a in areas
-        )
+        self._cells = tuple(Cell(c.idx, c.grid_x, c.grid_y, c.area_idx, c.border, c.bbox) for c in cells)
+        self._areas = tuple(Area(
+            a.idx, tuple(c.idx for c in a.cells), tuple(n.idx for n in a.neighbors),
+            a.center_cell.idx, a.border, a.bbox
+        ) for a in areas)
 
     @property
     def grid_size(self):
@@ -145,6 +145,7 @@ class _Cell:
         x0 = self.grid_x * 4 + (self.grid_y % 2) * 2
         y0 = self.grid_y * 3
         self.border = tuple((x0 + x, y0 + y) for (x, y) in self._POINTS)
+        self.bbox = ((x0, y0), (self.border[5][0], self.border[3][1]))
 
     def init(self, cells, grid_width, grid_height):
         # find neighbor cells (counter-clockwise)
@@ -173,6 +174,7 @@ class _Area:
         self.neighbors = []
         self.center_cell = None
         self.border = []  # counter-clockwise
+        self.bbox = None
 
     def init(self, areas):
         assert self.cells
@@ -200,11 +202,15 @@ class _Area:
                 dist_min = dist
                 self.center_cell = cell
 
-        # find border points (counter-clockwise)
+        # find border points (counter-clockwise) and bounding box
         assert start_edge
+        x_min, y_min, x_max, y_max = float('inf'), float('inf'), -1, -1
         cell, dir_ = start_edge
         while True:
-            self.border.append(cell.border[dir_])
+            point = cell.border[dir_]
+            self.border.append(point)
+            x_min, y_min = min(x_min, cell.bbox[0][0]), min(y_min, cell.bbox[0][1])
+            x_max, y_max = max(x_max, cell.bbox[1][0]), max(y_max, cell.bbox[1][1])
             dir_ += 1
             if dir_ == 6:
                 dir_ = 0
@@ -216,3 +222,5 @@ class _Area:
                     dir_ += 6
             if cell == start_edge[0] and dir_ == start_edge[1]:
                 break
+        self.border = tuple(self.border)
+        self.bbox = ((x_min, y_min), (x_max, y_max))
