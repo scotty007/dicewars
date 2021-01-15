@@ -98,10 +98,10 @@ class Grid:
 
         self._grid_size = (grid_width, grid_height)
         if 1 < grid_height:
-            map_w = max(c[0] for c in cells[grid_width * 2 - 1].border)
+            map_w = cells[grid_width * 2 - 1].bbox[1][0]
         else:
-            map_w = max(c[0] for c in cells[-1].border)
-        self._map_size = (map_w, max(c[1] for c in cells[-1].border))
+            map_w = cells[-1].bbox[1][0]
+        self._map_size = (map_w, cells[-1].bbox[1][1])
         self._cells = tuple(Cell(c.idx, c.grid_x, c.grid_y, c.area_idx, c.border, c.bbox) for c in cells)
         self._areas = tuple(Area(
             a.idx, tuple(c.idx for c in a.cells), tuple(n.idx for n in a.neighbors),
