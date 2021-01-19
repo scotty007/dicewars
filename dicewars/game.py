@@ -25,9 +25,10 @@ from . util import get_player_max_size
 
 
 class Game:
+    DEFAULT_NUM_SEATS = 7
     AREA_MAX_NUM_DICE = 8
 
-    def __init__(self, grid=None, num_seats=7):
+    def __init__(self, grid=None, num_seats=DEFAULT_NUM_SEATS):
         # TODO *args: asserts -> exceptions, upper num_seats bound
         if not grid:
             self._grid = Grid()

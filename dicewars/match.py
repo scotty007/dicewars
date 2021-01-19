@@ -19,9 +19,19 @@
 # along with dicewars.  If not, see <http://www.gnu.org/licenses/>.
 
 import random
+from collections import namedtuple
 
 from . game import Game
 from . util import get_player_max_size
+
+
+Attack = namedtuple(
+    'Attack',
+    'from_player from_area from_dice from_sum_dice '
+    'to_player to_area to_dice to_sum_dice '
+    'victory'
+)
+Supply = namedtuple('Supply', 'player areas dice sum_dice num_stock')
 
 
 class Match:
@@ -56,6 +66,8 @@ class Match:
         self._seat_idx = 0 if 1 < self._game.num_seats else -1
         self._from_area_idx = -1
         self._to_area_idx = -1
+        self._last_attack = None
+        self._last_supply = None
 
     @property
     def game(self):
@@ -104,6 +116,14 @@ class Match:
     @property
     def to_area(self):
         return self._to_area_idx
+
+    @property
+    def last_attack(self):
+        return self._last_attack
+
+    @property
+    def last_supply(self):
+        return self._last_supply
 
     def set_from_area(self, area_idx):
         if self._seat_idx == -1:
@@ -221,6 +241,12 @@ class Match:
         self._area_num_dice = tuple(self.__area_num_dice)
         self._player_num_dice = tuple(self.__player_num_dice)
 
+        self._last_attack = Attack(
+            from_player_idx, self._from_area_idx, from_rand_dice, from_sum_dice,
+            to_player_idx, self._to_area_idx, to_rand_dice, to_sum_dice,
+            victory
+        )
+
         self._from_area_idx = -1
         self._to_area_idx = -1
         return True
@@ -234,21 +260,35 @@ class Match:
         assert num_stock
         if self.PLAYER_MAX_NUM_STOCK < num_stock:  # TODO: clamp _after_ supply?
             num_stock = self.PLAYER_MAX_NUM_STOCK
+
+        player_areas = self.__player_areas[player_idx]
+        area_supplies = dict((a_idx, 0) for a_idx in player_areas)
         while num_stock:
             areas = [
-                a_idx for a_idx in self.__player_areas[player_idx]
+                a_idx for a_idx in player_areas
                 if self.__area_num_dice[a_idx] < self.AREA_MAX_NUM_DICE
             ]
             if areas:
-                self.__area_num_dice[random.choice(areas)] += 1
+                area_idx = random.choice(areas)
+                self.__area_num_dice[area_idx] += 1
                 self.__player_num_dice[player_idx] += 1
                 num_stock -= 1
+                area_supplies[area_idx] += 1
             else:
                 break
         self._area_num_dice = tuple(self.__area_num_dice)
         self._player_num_dice = tuple(self.__player_num_dice)
         self.__player_num_stock[player_idx] = num_stock
         self._player_num_stock = tuple(self.__player_num_stock)
+
+        area_supplies = tuple((a_idx, n_dice) for a_idx, n_dice in area_supplies.items() if n_dice)
+        self._last_supply = Supply(
+            player_idx,
+            tuple(area_supply[0] for area_supply in area_supplies),
+            tuple(area_supply[1] for area_supply in area_supplies),
+            sum(area_supply[1] for area_supply in area_supplies),
+            num_stock
+        )
 
         while True:
             self._seat_idx += 1

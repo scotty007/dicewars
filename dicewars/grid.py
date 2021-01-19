@@ -27,7 +27,15 @@ Area = namedtuple('Area', 'idx cells neighbors center border bbox')
 
 
 class Grid:
-    def __init__(self, grid_width=28, grid_height=32, max_num_areas=30, min_area_size=5):
+    DEFAULT_GRID_WIDTH = 28
+    DEFAULT_GRID_HEIGHT = 32
+    DEFAULT_MAX_NUM_AREAS = 30
+    DEFAULT_MIN_AREA_SIZE = 5
+
+    def __init__(
+        self, grid_width=DEFAULT_GRID_WIDTH, grid_height=DEFAULT_GRID_HEIGHT,
+        max_num_areas=DEFAULT_MAX_NUM_AREAS, min_area_size=DEFAULT_MIN_AREA_SIZE
+    ):
         # TODO *args: asserts -> exceptions, upper bounds
         assert 1 <= grid_width
         assert 1 <= grid_height
