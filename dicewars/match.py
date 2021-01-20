@@ -25,6 +25,11 @@ from . game import Game
 from . util import get_player_max_size
 
 
+State = namedtuple(
+    'State',
+    'seat player area_players area_num_dice '
+    'player_areas player_num_areas player_max_size player_num_dice player_num_stock'
+)
 Attack = namedtuple(
     'Attack',
     'from_player from_area from_dice from_sum_dice '
@@ -69,9 +74,16 @@ class Match:
         self._last_attack = None
         self._last_supply = None
 
+        self._state = None  # for convenient match state access/passing
+        self._update_state()
+
     @property
     def game(self):
         return self._game
+
+    @property
+    def state(self):
+        return self._state
 
     @property
     def seat(self):
@@ -247,6 +259,7 @@ class Match:
             victory
         )
 
+        self._update_state()
         self._from_area_idx = -1
         self._to_area_idx = -1
         return True
@@ -298,6 +311,14 @@ class Match:
                 assert self.__player_num_areas[self.player] < len(self._game.grid.areas)
                 break
 
+        self._update_state()
         self._from_area_idx = -1
         self._to_area_idx = -1
         return True
+
+    def _update_state(self):
+        self._state = State(
+            self._seat_idx, self.player, self._area_players, self._area_num_dice,
+            self._player_areas, self._player_num_areas, self._player_max_size,
+            self._player_num_dice, self._player_num_stock
+        )
