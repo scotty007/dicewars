@@ -22,17 +22,17 @@ import random
 
 
 class Player:
-    def get_attack_areas(self, grid, match_state):
+    def get_attack_areas(self, grid, match_state, *args, **kwargs):
         raise NotImplementedError(f'{self.__class__} get_attack_areas()')
 
 
 class PassivePlayer(Player):  # for testing
-    def get_attack_areas(self, grid, match_state):
+    def get_attack_areas(self, grid, match_state, *args, **kwargs):
         return None
 
 
 class DefaultPlayer(Player):
-    def get_attack_areas(self, grid, match_state):
+    def get_attack_areas(self, grid, match_state, *args, **kwargs):
         from_player_idx = match_state.player
         a_players = match_state.area_players
         a_num_dice = match_state.area_num_dice
