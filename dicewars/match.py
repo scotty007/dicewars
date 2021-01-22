@@ -27,7 +27,7 @@ from . util import get_player_max_size
 
 State = namedtuple(
     'State',
-    'seat player area_players area_num_dice '
+    'seat player winner area_players area_num_dice '
     'player_areas player_num_areas player_max_size player_num_dice player_num_stock'
 )
 Attack = namedtuple(
@@ -69,6 +69,7 @@ class Match:
         self._player_num_stock = tuple(self.__player_num_stock)
 
         self._seat_idx = 0 if 1 < self._game.num_seats else -1
+        self._winner = -1 if self._seat_idx != -1 else 0
         self._from_area_idx = -1
         self._to_area_idx = -1
         self._last_attack = None
@@ -92,6 +93,10 @@ class Match:
     @property
     def player(self):
         return self._game.seat_order[self._seat_idx] if self._seat_idx != -1 else -1
+
+    @property
+    def winner(self):
+        return self._winner
 
     @property
     def area_players(self):
@@ -247,6 +252,7 @@ class Match:
             assert self.__player_num_areas[to_player_idx] <= self.__player_num_dice[to_player_idx]
             if self.__player_num_areas[from_player_idx] == len(self._game.grid.areas):
                 self._seat_idx = -1
+                self._winner = from_player_idx
         else:
             self.__player_num_dice[from_player_idx] -= attack_num_dice
             assert self.__player_num_areas[from_player_idx] <= self.__player_num_dice[from_player_idx]
@@ -318,7 +324,8 @@ class Match:
 
     def _update_state(self):
         self._state = State(
-            self._seat_idx, self.player, self._area_players, self._area_num_dice,
+            self._seat_idx, self.player, self._winner,
+            self._area_players, self._area_num_dice,
             self._player_areas, self._player_num_areas, self._player_max_size,
             self._player_num_dice, self._player_num_stock
         )
