@@ -18,24 +18,137 @@
 # You should have received a copy of the GNU General Public License
 # along with dicewars.  If not, see <http://www.gnu.org/licenses/>.
 
+r"""
+Generate random hexagonal cell grids.
+
+:class:`Grid`\s are composed of hexagonal :class:`Cell`\s.
+Groups of adjacent :class:`Cell`\s are assigned to adjacent
+:class:`Area`\s of random size and shape.
+
+All :class:`Cell` and :class:`Area` references are indices into the
+:attr:`Grid.cells` and :attr:`Grid.areas` tuples, respectively.
+
+:class:`Grid` instances are immutable and intended for
+:class:`~dicewars.game.Game` generation, but may be useful for other
+hex-map based games as well. They provide coordinates for convenient
+frontend map rendering.
+"""
+
 import random
 from collections import namedtuple
 
 
 Cell = namedtuple('Cell', 'idx grid_x grid_y area border bbox')
+r"""
+A hexagonal cell - the basic building block of each :class:`Grid`. (`namedtuple`)
+
+Cell instances are created by :class:`Grid` and used for :class:`Area`
+assignment. They are not used by the game logic, but may be useful for
+frontends.
+
+.. attribute:: idx
+   :type: int
+
+   The cell's index in :attr:`Grid.cells`.
+
+.. attribute:: grid_x
+   :type: int
+
+   The cell's grid column.
+
+.. attribute:: grid_y
+   :type: int
+
+   The cell's grid row.
+
+.. attribute:: area
+   :type: int
+
+   The index of the :class:`Area` the cell is assigned to, `-1` if not assigned.
+
+.. attribute:: border
+   :type: tuple(tuple(int, int))
+
+   *For frontend map rendering.* A 6-tuple of (x, y) pixel coordinates
+   of the hexagonal cell polygon on the map (in counter-clockwise order,
+   starting at the top center point).
+
+.. attribute:: bbox
+   :type: tuple(tuple(int, int), tuple(int, int))
+
+   The upper left (``bbox[0]``) and lower right (``bbox[1]``) (x, y) pixel
+   coordinates of the cell's bounding box on the map.
+"""
+
 Area = namedtuple('Area', 'idx cells neighbors center border bbox')
+r"""
+A group of adjacent :class:`Cell`\s in a :class:`Grid`. (`namedtuple`)
+
+Area instances are created by :class:`Grid` and used by the game logic.
+They may be useful for frontend map rendering as well.
+
+.. attribute:: idx
+   :type: int
+
+   The area's index in :attr:`Grid.areas`.
+
+.. attribute:: cells
+   :type: tuple(int)
+
+   The indices of all :class:`Cell`\s assigned to the area.
+
+.. attribute:: neighbors
+   :type: tuple(int)
+
+   The indices of all areas adjacent to the area.
+
+.. attribute:: center
+   :type: int
+
+   *For frontend map rendering.* The index of the area's center :class:`Cell`.
+
+.. attribute:: border
+   :type: tuple(tuple(int, int))
+
+   *For frontend map rendering.* A tuple of (x, y) pixel coordinates of the
+   area polygon on the map (outer :class:`Cell` edges, in counter-clockwise
+   order).
+
+.. attribute:: bbox
+   :type: tuple(tuple(int, int), tuple(int, int))
+
+   The upper left (``bbox[0]``) and lower right (``bbox[1]``) (x, y) pixel
+   coordinates of the area's bounding box on the map.
+"""
 
 
 class Grid:
     DEFAULT_GRID_WIDTH = 28
+    """Default for the ``grid_width`` parameter. (`int`)"""
     DEFAULT_GRID_HEIGHT = 32
+    """Default for the ``grid_height`` parameter. (`int`)"""
     DEFAULT_MAX_NUM_AREAS = 30
+    """Default for the ``max_num_areas`` parameter. (`int`)"""
     DEFAULT_MIN_AREA_SIZE = 5
+    """Default for the ``min_area_size`` parameter. (`int`)"""
 
     def __init__(
         self, grid_width=DEFAULT_GRID_WIDTH, grid_height=DEFAULT_GRID_HEIGHT,
         max_num_areas=DEFAULT_MAX_NUM_AREAS, min_area_size=DEFAULT_MIN_AREA_SIZE
     ):
+        r"""
+        Generate a grid and assign :class:`Cell`\s to :class:`Area`\s.
+
+        :param int grid_width: number of cell columns
+        :param int grid_height: number of cell rows
+        :param int max_num_areas: maximal number of areas to create
+        :param int min_area_size: minimal number of cells per area
+
+        .. note::
+           The number of created areas is less than ``max_num_areas`` if there
+           are not enough cells left to assign.
+        """
+
         # TODO *args: asserts -> exceptions, upper bounds
         assert 1 <= grid_width
         assert 1 <= grid_height
@@ -118,27 +231,40 @@ class Grid:
 
     @property
     def grid_size(self):
+        """The number of cell columns (``grid_width``) and rows (``grid_height``). (`tuple(int, int)`)"""
         return self._grid_size
 
     @property
     def map_size(self):
+        r"""
+        The size of the grid in pixels. (`tuple(int, int)`)
+
+        *For frontend map rendering.* ``map_size`` is the bounding box size
+        of all :attr:`Cell.bbox`\es and may be used for proper map scaling.
+        """
+
         return self._map_size
 
     @property
     def cells(self):
+        """All :class:`Cell` instances created by the grid. (`tuple(Cell)`)"""
         return self._cells
 
     @property
     def areas(self):
+        """All :class:`Area` instances created by the grid. (`tuple(Area)`)"""
         return self._areas
 
     def dump(self):
+        """Dump the grid (area indices) to the console."""
         cells = self.cells
         grid_w, grid_h = self.grid_size
         for y in range(grid_h):
             row, cells = cells[:grid_w], cells[grid_w:]
             print(f'{" " * (y % 2)}{" ".join(f"{c.area:02d}" if c.area != -1 else "--" for c in row)}')
 
+
+# _Cell/_Area objects internally used for grid generation, then dropped #
 
 class _Cell:
     # border points (counter-clockwise, 5x5 raster, starting at top center)

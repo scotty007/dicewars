@@ -18,21 +18,55 @@
 # You should have received a copy of the GNU General Public License
 # along with dicewars.  If not, see <http://www.gnu.org/licenses/>.
 
+"""
+Implement and use AI players in matches.
+
+Custom AI players may subclass :class:`Player` and implement
+:meth:`Player.get_attack_areas` to offer a consistent interface
+to game engines.
+"""
+
 import random
 
 
 class Player:
+    """Base class for AI players."""
+
     def get_attack_areas(self, grid, match_state, *args, **kwargs):
+        """
+        Choose (valid) areas for a :class:`~dicewars.match.Match` attack.
+
+        Override this method in subclasses. It is provided with full
+        :class:`~dicewars.grid.Grid` and match :class:`~dicewars.match.State`
+        information (and optional user data). If there is an attack possible
+        and wanted, return a pair of attacking/attacked areas.
+
+        :param Grid grid: :class:`~dicewars.grid.Grid` instance of the match
+           (:attr:`Match.game.grid`)
+        :param `State` match_state: current match :class:`~dicewars.match.State`
+           (:attr:`Match.state`)
+        :param args: user arguments (optional)
+        :param kwargs: user keyword arguments (optional)
+        :return: indices of attacking and attacked areas, `None` to not attack
+        :rtype: tuple(int, int) or None
+        """
+
         raise NotImplementedError(f'{self.__class__} get_attack_areas()')
 
 
-class PassivePlayer(Player):  # for testing
+class PassivePlayer(Player):
+    """A lazy AI player that never attacks (for testing)."""
+
     def get_attack_areas(self, grid, match_state, *args, **kwargs):
+        """:return: None"""
         return None
 
 
 class DefaultPlayer(Player):
+    """A (more or less) clever AI player."""
+
     def get_attack_areas(self, grid, match_state, *args, **kwargs):
+        """Collect reasonable attack area pairs and return a random one of them."""
         from_player_idx = match_state.player
         a_players = match_state.area_players
         a_num_dice = match_state.area_num_dice

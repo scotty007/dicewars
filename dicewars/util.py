@@ -20,6 +20,17 @@
 
 
 def get_player_max_size(grid_areas, player_areas):
+    """
+    Calculate the maximal number of adjacent player areas.
+
+    :param tuple(Area) grid_areas: :class:`~dicewars.grid.Area` instances
+       of a :class:`~dicewars.grid.Grid` (:attr:`Grid.areas`)
+    :param player_areas: indices of player's areas in ``grid_areas``
+    :type player_areas: tuple(int) or list(int)
+    :return: maximal number of adjacent areas in ``player_areas``
+    :rtype: int
+    """
+
     max_size = 0
     done_areas = []
     for area_idx in player_areas:
@@ -47,6 +58,19 @@ def get_player_max_size(grid_areas, player_areas):
 
 
 def point_in_grid_cell(cell, map_x, map_y):
+    """
+    Test if a point is inside a (hexagonal) grid cell.
+
+    :param Cell cell: :class:`~dicewars.grid.Cell` instance to test
+       (one out of :attr:`Grid.cells`)
+    :param map_x: point's x coordinate (in unscaled map space)
+    :type map_x: int or float
+    :param map_y: point's y coordinate (in unscaled map space)
+    :type map_y: int or float
+    :return: `True` if point is inside ``cell``, else `False`
+    :rtype: bool
+    """
+
     # bounding box test
     (x0, y0), (x1, y1) = cell.bbox
     if not (x0 <= map_x < x1 and y0 <= map_y < y1):
@@ -65,6 +89,21 @@ def point_in_grid_cell(cell, map_x, map_y):
 
 
 def point_in_grid_area(grid, area, map_x, map_y):
+    """
+    Test if a point is inside a (polygonal) grid area.
+
+    :param Grid grid: :class:`~dicewars.grid.Grid` instance that
+       created the ``area``
+    :param Area area: :class:`~dicewars.grid.Area` instance to test
+       (one out of :attr:`Grid.areas`)
+    :param map_x: point's x coordinate (in unscaled map space)
+    :type map_x: int or float
+    :param map_y: point's y coordinate (in unscaled map space)
+    :type map_y: int or float
+    :return: `True` if point is inside ``area``, else `False`
+    :rtype: bool
+    """
+
     # bounding box test
     (x0, y0), (x1, y1) = area.bbox
     if not (x0 <= map_x < x1 and y0 <= map_y < y1):
@@ -77,6 +116,18 @@ def point_in_grid_area(grid, area, map_x, map_y):
 
 
 def pick_grid_cell(grid, map_x, map_y):
+    """
+    Find the (hexagonal) grid cell that encloses a point.
+
+    :param Grid grid: :class:`~dicewars.grid.Grid` instance to search in
+    :param map_x: point's x coordinate (in unscaled map space)
+    :type map_x: int or float
+    :param map_y: point's y coordinate (in unscaled map space)
+    :type map_y: int or float
+    :return: :class:`~dicewars.grid.Cell` instance if found, else `None`
+    :rtype: Cell
+    """
+
     for cell in grid.cells:
         if point_in_grid_cell(cell, map_x, map_y):
             return cell
@@ -84,6 +135,18 @@ def pick_grid_cell(grid, map_x, map_y):
 
 
 def pick_grid_area(grid, map_x, map_y):
+    """
+    Find the (polygonal) grid area that encloses a point.
+
+    :param Grid grid: :class:`~dicewars.grid.Grid` instance to search in
+    :param map_x: point's x coordinate (in unscaled map space)
+    :type map_x: int or float
+    :param map_y: point's y coordinate (in unscaled map space)
+    :type map_y: int or float
+    :return: :class:`~dicewars.grid.Area` instance if found, else `None`
+    :rtype: Area
+    """
+
     for area in grid.areas:
         if point_in_grid_area(grid, area, map_x, map_y):
             return area
