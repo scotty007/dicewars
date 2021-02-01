@@ -16,14 +16,23 @@ here = Path(__file__).absolute().parent
 
 NAME = 'dicewars'
 VERSION = load_version()
+CLASSIFIERS = [
+    'Topic :: Games/Entertainment :: Board Games',
+    'Intended Audience :: Developers',
+    'Programming Language :: Python :: 3 :: Only',
+    'Development Status :: 4 - Beta',
+    'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+]
 PACKAGES = find_packages()
 
 setup(
     name=NAME,
     version=VERSION,
-    description='Backend for DiceWars games',
+    description='Backend for DiceWars games/servers',
     author='Thomas Schott',
     author_email='scotty@c-base.org',
+    url='https://github.com/scotty007/dicewars',
+    classifiers=CLASSIFIERS,
     python_requires='>=3.7',
     packages=PACKAGES,
 )
