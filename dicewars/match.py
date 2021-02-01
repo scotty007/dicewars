@@ -30,7 +30,7 @@ A :class:`Match` is initialized from a match configuration
 create a new instance from the same configuration.
 
 The game logic is implemented in :meth:`Match.attack` and
-:meth:`Match.end_turn`. Only these methods change the match state.
+:meth:`Match.end_turn`. Only these two methods change the match state.
 
 The match loop is:
 
@@ -194,12 +194,14 @@ class Match:
            the match state (if `None`: a :class:`~dicewars.game.Game` with
            default parameters is generated)
         :type game: Game or None
+        :raise TypeError: if ``game`` is not a `Game` instance
         """
 
-        if not game:
+        if game is None:
             self._game = Game()
         else:
-            assert isinstance(game, Game)  # TODO: exception
+            if not isinstance(game, Game):
+                raise TypeError('game must be an instance of Game')
             self._game = game
 
         # internal areas/players states
@@ -318,7 +320,11 @@ class Match:
         :return: `True` if accepted and changed or unset,
            `False` when rejected or unchanged
         :rtype: bool
+        :raise TypeError: if ``area_idx`` is not `int`
         """
+
+        if not isinstance(area_idx, int):
+            raise TypeError('area_idx must be int')
 
         if self._seat_idx == -1:
             return False
@@ -357,7 +363,11 @@ class Match:
         :return: `True` if accepted and changed or unset,
            `False` when rejected or unchanged
         :rtype: bool
+        :raise TypeError: if ``area_idx`` is not `int`
         """
+
+        if not isinstance(area_idx, int):
+            raise TypeError('area_idx must be int')
 
         if self._seat_idx == -1:
             return False
@@ -491,7 +501,7 @@ class Match:
         player_idx = self.player
         num_stock = self.__player_num_stock[player_idx] + self.__player_max_size[player_idx]
         assert num_stock
-        if self.PLAYER_MAX_NUM_STOCK < num_stock:  # TODO: clamp _after_ supply?
+        if self.PLAYER_MAX_NUM_STOCK < num_stock:
             num_stock = self.PLAYER_MAX_NUM_STOCK
 
         player_areas = self.__player_areas[player_idx]

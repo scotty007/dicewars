@@ -143,19 +143,36 @@ class Grid:
         :param int grid_height: number of cell rows
         :param int max_num_areas: maximal number of areas to create
         :param int min_area_size: minimal number of cells per area
+        :raise TypeError: if a parameter is not `int`
+        :raise ValueError: if a parameter is out of range
 
         .. note::
            The number of created areas is less than ``max_num_areas`` if there
            are not enough cells left to assign.
         """
 
-        # TODO *args: asserts -> exceptions, upper bounds
-        assert 1 <= grid_width
-        assert 1 <= grid_height
-        assert 1 <= max_num_areas
-        assert 1 <= min_area_size <= grid_width * grid_height
+        # TODO: upper param bounds?
+        if not isinstance(grid_width, int):
+            raise TypeError('grid_width must be int')
+        if grid_width < 1:
+            raise ValueError('grid_width must be > 0')
+        if not isinstance(grid_height, int):
+            raise TypeError('grid_height must be int')
+        if grid_height < 1:
+            raise ValueError('grid_height must be > 0')
+        if not isinstance(max_num_areas, int):
+            raise TypeError('max_num_areas must be int')
+        if max_num_areas < 1:
+            raise ValueError('max_num_areas must be > 0')
+        if not isinstance(min_area_size, int):
+            raise TypeError('min_area_size must be int')
+        if min_area_size < 1:
+            raise ValueError('min_area_size must be > 0')
 
         num_cells = grid_width * grid_height
+        if num_cells < min_area_size:
+            raise ValueError(f'min_area_size must be <= (grid_width * grid_height)={num_cells}')
+
         cells = [_Cell(c_idx, grid_width) for c_idx in range(num_cells)]
         for cell in cells:
             cell.init(cells, grid_width, grid_height)

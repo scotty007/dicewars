@@ -54,15 +54,21 @@ class Game:
            default parameters is generated)
         :type grid: Grid or None
         :param int num_seats: number of player seats
+        :raise TypeError: if ``grid`` is not a `Grid` instance or ``num_seats`` is not `int`
+        :raise ValueError: if ``num_seats`` is out of range
         """
 
-        # TODO *args: asserts -> exceptions, upper num_seats bound
-        if not grid:
+        # TODO: upper num_seats bound?
+        if grid is None:
             self._grid = Grid()
         else:
-            assert isinstance(grid, Grid)
+            if not isinstance(grid, Grid):
+                raise TypeError('grid must be an instance of Grid')
             self._grid = grid
-        assert 1 <= num_seats
+        if not isinstance(num_seats, int):
+            raise TypeError('num_seats must be int')
+        if num_seats < 1:
+            raise ValueError('num_seats must be > 0')
 
         num_areas = len(self._grid.areas)
         seat_random_order = [s_idx for s_idx in range(num_seats)]
