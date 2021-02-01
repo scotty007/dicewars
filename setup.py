@@ -12,10 +12,17 @@ def load_version():
     return version['__version__']
 
 
+def load_readme():
+    with open(str(here / 'README.md'), 'r') as fp:
+        readme = fp.read()
+    return readme, 'text/markdown'
+
+
 here = Path(__file__).absolute().parent
 
 NAME = 'dicewars'
 VERSION = load_version()
+LONG_DESC, LONG_DESC_CONTENT_TYPE = load_readme()
 CLASSIFIERS = [
     'Topic :: Games/Entertainment :: Board Games',
     'Intended Audience :: Developers',
@@ -30,6 +37,8 @@ setup(
     name=NAME,
     version=VERSION,
     description='Backend for DiceWars games/servers',
+    long_description=LONG_DESC,
+    long_description_content_type=LONG_DESC_CONTENT_TYPE,
     author='Thomas Schott',
     author_email='scotty@c-base.org',
     url='https://github.com/scotty007/dicewars',
