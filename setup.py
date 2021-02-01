@@ -19,6 +19,7 @@ VERSION = load_version()
 CLASSIFIERS = [
     'Topic :: Games/Entertainment :: Board Games',
     'Intended Audience :: Developers',
+    'Operating System :: OS Independent',
     'Programming Language :: Python :: 3 :: Only',
     'Development Status :: 4 - Beta',
     'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',

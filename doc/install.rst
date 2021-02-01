@@ -1,6 +1,19 @@
 Installation
 ============
 
+From PyPI
+---------
+
+**dicewars** is available on
+`The Python Package Index <https://pypi.org/project/dicewars/>`_.
+
+Preferably in a Python virtual env, run:
+
+.. code-block::
+
+    $ pip install dicewars
+
+
 From source
 -----------
 
@@ -11,19 +24,13 @@ virtual env), run:
 
 .. code-block::
 
-   $ python setup.py install
+   $ pip install .
 
 or
 
 .. code-block::
 
-   $ pip install .
-
-
-From PyPi
----------
-
-Not yet published there, sorry.
+   $ python setup.py install
 
 
 Documentation
@@ -34,8 +41,8 @@ and run `Sphinx <https://www.sphinx-doc.org/>`_:
 
 .. code-block::
 
-   $ pip install -r requirements-doc.txt
    $ cd doc
+   $ pip install -r requirements.txt
    $ make html
 
 The HTML documentation is generated in :file:`doc/_build/html/`.
