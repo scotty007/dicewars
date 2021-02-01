@@ -8,8 +8,8 @@ map by dice rolls.
 **dicewars** implements the logic (the backend) that is required to create
 playable game GUIs (the frontends) and (multi player) game servers in Python.
 
-See the [Documentation](TODO: rtd-link) for more information
-and [API Reference](TODO: rtd-link).
+See the [Documentation](https://dicewars.readthedocs.io/) for more information
+and [API Reference](https://dicewars.readthedocs.io/en/latest/api.html).
 
 **dicewars** is pure Python (>=3.7), has no external dependencies and is
 distributed under the terms of the
