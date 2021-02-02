@@ -1,5 +1,5 @@
-Welcome to dicewars's documentation!
-====================================
+Welcome to dicewars' documentation!
+===================================
 
 .. automodule:: dicewars
 
