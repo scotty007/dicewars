@@ -99,13 +99,15 @@ Attack = namedtuple(
     'step '
     'from_player from_area from_dice from_sum_dice '
     'to_player to_area to_dice to_sum_dice '
-    'victory'
+    'victory '
+    'from_area_num_dice from_player_num_areas from_player_max_size from_player_num_dice '
+    'to_area_num_dice to_player_num_areas to_player_max_size to_player_num_dice'
 )
 """
 Information and result of an executed attack. (`namedtuple`)
 
 Attack instances are created in :meth:`Match.attack` and available via
-:attr:`Match.last_attack` afterwards.
+:attr:`Match.last_attack` and :attr:`Match.history` afterwards.
 
 .. attribute:: step
    :type: int
@@ -158,14 +160,70 @@ Attack instances are created in :meth:`Match.attack` and available via
    :type: bool
 
    `True` if successful, `False` if defeated.
+
+.. attribute:: from_area_num_dice
+   :type: int
+
+   The number of dice placed on the attacking area (always `1` for standard game rules).
+
+   .. versionadded:: 0.2.0
+
+.. attribute:: from_player_num_areas
+   :type: int
+
+   The total number of areas occupied by the attacking player.
+
+   .. versionadded:: 0.2.0
+
+.. attribute:: from_player_max_size
+   :type: int
+
+   The maximal number of adjacent areas occupied by the attacking player.
+
+   .. versionadded:: 0.2.0
+
+.. attribute:: from_player_num_dice
+   :type: int
+
+   The total number of dice placed on the attacking player’s areas.
+
+   .. versionadded:: 0.2.0
+
+.. attribute:: to_area_num_dice
+   :type: int
+
+   The number of dice placed on the attacked area.
+
+   .. versionadded:: 0.2.0
+
+.. attribute:: to_player_num_areas
+   :type: int
+
+   The total number of areas occupied by the attacked player.
+
+   .. versionadded:: 0.2.0
+
+.. attribute:: to_player_max_size
+   :type: int
+
+   The maximal number of adjacent areas occupied by the attacked player.
+
+   .. versionadded:: 0.2.0
+
+.. attribute:: to_player_num_dice
+   :type: int
+
+   The total number of dice placed on the attacked player’s areas.
+
+   .. versionadded:: 0.2.0
 """
 
-Supply = namedtuple('Supply', 'step player areas dice sum_dice num_stock')
+Supply = namedtuple('Supply', 'step player areas dice sum_dice area_num_dice player_num_stock')
 """
 The outcome of dice supply at the end of a player's turn. (`namedtuple`)
 
 Supply instances are created in :meth:`Match.end_turn` and available via
-:attr:`Match.last_supply` afterwards.
+:attr:`Match.last_supply` and :attr:`Match.history` afterwards.
 
 .. attribute:: step
    :type: int
@@ -194,10 +252,20 @@ Supply instances are created in :meth:`Match.end_turn` and available via
 
    The sum of :attr:`dice`.
 
-.. attribute:: num_stock
+.. attribute:: area_num_dice
+   :type: tuple(int)
+
+   The number of dice placed on the areas in :attr:`areas`.
+
+   .. versionadded:: 0.2.0
+
+.. attribute:: player_num_stock
    :type: int
 
    The number of dice stored in the player's stock.
+
+   .. versionchanged:: 0.2.0
+      Renamed from "num_stock".
 """
 
 
@@ -519,7 +587,11 @@ class Match:
             self.num_steps,
             from_player_idx, self._from_area_idx, from_rand_dice, from_sum_dice,
             to_player_idx, self._to_area_idx, to_rand_dice, to_sum_dice,
-            victory
+            victory,
+            self.__area_num_dice[self._from_area_idx], self.__player_num_areas[from_player_idx],
+            self.__player_max_size[from_player_idx], self.__player_num_dice[from_player_idx],
+            self.__area_num_dice[self._to_area_idx], self.__player_num_areas[to_player_idx],
+            self.__player_max_size[to_player_idx], self.__player_num_dice[to_player_idx],
         )
         self.__history.append(self._last_attack)
         self._history = None
@@ -573,12 +645,16 @@ class Match:
         self.__player_num_stock[player_idx] = num_stock
         self._player_num_stock = tuple(self.__player_num_stock)
 
-        area_supplies = tuple((a_idx, n_dice) for a_idx, n_dice in area_supplies.items() if n_dice)
+        area_supplies = tuple(
+            (a_idx, n_dice, self.__area_num_dice[a_idx])
+            for a_idx, n_dice in area_supplies.items() if n_dice
+        )
         self._last_supply = Supply(
             self.num_steps, player_idx,
             tuple(area_supply[0] for area_supply in area_supplies),
             tuple(area_supply[1] for area_supply in area_supplies),
             sum(area_supply[1] for area_supply in area_supplies),
+            tuple(area_supply[2] for area_supply in area_supplies),
             num_stock
         )
         self.__history.append(self._last_supply)
