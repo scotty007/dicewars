@@ -58,19 +58,22 @@ class Game:
         :raise ValueError: if ``num_seats`` is out of range
         """
 
-        # TODO: upper num_seats bound?
         if grid is None:
             self._grid = Grid()
         else:
             if not isinstance(grid, Grid):
                 raise TypeError('grid must be an instance of Grid')
             self._grid = grid
+
+        num_areas = len(self._grid.areas)
+
         if not isinstance(num_seats, int):
             raise TypeError('num_seats must be int')
         if num_seats < 1:
             raise ValueError('num_seats must be > 0')
+        if num_areas < num_seats:
+            raise ValueError(f'num_seats must be <= grid.num_areas={num_areas}')
 
-        num_areas = len(self._grid.areas)
         seat_random_order = [s_idx for s_idx in range(num_seats)]
 
         # random seat order
