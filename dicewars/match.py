@@ -31,6 +31,8 @@ create a new instance from the same configuration.
 
 The game logic is implemented in :meth:`Match.attack` and
 :meth:`Match.end_turn`. Only these two methods change the match state.
+All executed actions are available in :attr:`Match.history` for e.g.
+match replays.
 
 The match loop is:
 
@@ -64,7 +66,7 @@ from . util import get_player_max_size
 
 State = namedtuple(
     'State',
-    'seat player winner area_players area_num_dice '
+    'num_steps seat player winner area_players area_num_dice '
     'player_areas player_num_areas player_max_size player_num_dice player_num_stock'
 )
 """
@@ -73,6 +75,7 @@ A convenience wrapper to access the current match state data at once. (`namedtup
 The (copied) value or (referenced) tuple properties of a :class:`Match`
 instance are:
 
+* :attr:`~Match.num_steps`
 * :attr:`~Match.seat`
 * :attr:`~Match.player`
 * :attr:`~Match.winner`
@@ -85,11 +88,15 @@ instance are:
 * :attr:`~Match.player_num_stock`
 
 The current State instance is available via :attr:`Match.state` and valid
-until a call of :meth:`Match.attack` or :meth:`Match.end_turn`.
+until a (successful) call of :meth:`Match.attack` or :meth:`Match.end_turn`.
+
+.. versionchanged:: 0.2.0
+   Added ``num_steps``.
 """
 
 Attack = namedtuple(
     'Attack',
+    'step '
     'from_player from_area from_dice from_sum_dice '
     'to_player to_area to_dice to_sum_dice '
     'victory'
@@ -99,6 +106,13 @@ Information and result of an executed attack. (`namedtuple`)
 
 Attack instances are created in :meth:`Match.attack` and available via
 :attr:`Match.last_attack` afterwards.
+
+.. attribute:: step
+   :type: int
+
+   The Attack's index in :attr:`Match.history`.
+
+   .. versionadded:: 0.2.0
 
 .. attribute:: from_player
    :type: int
@@ -146,12 +160,19 @@ Attack instances are created in :meth:`Match.attack` and available via
    `True` if successful, `False` if defeated.
 """
 
-Supply = namedtuple('Supply', 'player areas dice sum_dice num_stock')
+Supply = namedtuple('Supply', 'step player areas dice sum_dice num_stock')
 """
 The outcome of dice supply at the end of a player's turn. (`namedtuple`)
 
 Supply instances are created in :meth:`Match.end_turn` and available via
 :attr:`Match.last_supply` afterwards.
+
+.. attribute:: step
+   :type: int
+
+   The Supply's index in :attr:`Match.history`.
+
+   .. versionadded:: 0.2.0
 
 .. attribute:: player
    :type: int
@@ -229,6 +250,9 @@ class Match:
         self._last_attack = None
         self._last_supply = None
 
+        self.__history = []
+        self._history = None  # exposed (read only) mirror, created/updated only on request
+
         self._state = None  # for convenient full match state access/passing
         self._update_state()
 
@@ -241,6 +265,16 @@ class Match:
     def state(self):
         """The :class:`State` instance of the current match state."""
         return self._state
+
+    @property
+    def num_steps(self):
+        """
+        The number of (successful) :meth:`attack` and :meth:`end_turn` calls. (`int`)
+
+        .. versionadded:: 0.2.0
+        """
+
+        return len(self.__history)
 
     @property
     def seat(self):
@@ -311,6 +345,18 @@ class Match:
     def last_supply(self):
         """The :class:`Supply` instance created by the last (successful) call of :meth:`end_turn`."""
         return self._last_supply
+
+    @property
+    def history(self):
+        r"""
+        The sequence of all :class:`Attack`\s and :class:`Supply`\s so far. (`tuple(Attack/Supply)`)
+
+        .. versionadded:: 0.2.0
+        """
+
+        if self._history is None:
+            self._history = tuple(self.__history)
+        return self._history
 
     def set_from_area(self, area_idx):
         """
@@ -470,10 +516,13 @@ class Match:
         self._player_num_dice = tuple(self.__player_num_dice)
 
         self._last_attack = Attack(
+            self.num_steps,
             from_player_idx, self._from_area_idx, from_rand_dice, from_sum_dice,
             to_player_idx, self._to_area_idx, to_rand_dice, to_sum_dice,
             victory
         )
+        self.__history.append(self._last_attack)
+        self._history = None
 
         self._update_state()
         self._from_area_idx = -1
@@ -526,12 +575,14 @@ class Match:
 
         area_supplies = tuple((a_idx, n_dice) for a_idx, n_dice in area_supplies.items() if n_dice)
         self._last_supply = Supply(
-            player_idx,
+            self.num_steps, player_idx,
             tuple(area_supply[0] for area_supply in area_supplies),
             tuple(area_supply[1] for area_supply in area_supplies),
             sum(area_supply[1] for area_supply in area_supplies),
             num_stock
         )
+        self.__history.append(self._last_supply)
+        self._history = None
 
         while True:
             self._seat_idx += 1
@@ -548,7 +599,7 @@ class Match:
 
     def _update_state(self):
         self._state = State(
-            self._seat_idx, self.player, self._winner,
+            self.num_steps, self._seat_idx, self.player, self._winner,
             self._area_players, self._area_num_dice,
             self._player_areas, self._player_num_areas, self._player_max_size,
             self._player_num_dice, self._player_num_stock
