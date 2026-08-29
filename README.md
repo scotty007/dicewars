@@ -26,7 +26,7 @@ distributed under the terms of the
 
 ### From source ###
 
-Get the [source code](https://github.com/scotty007/dicewars).
+Get the [source code](https://codeberg.org/scotty007/dicewars).
 In the top-level directory:
 
     $ pip install .

@@ -41,7 +41,7 @@ setup(
     long_description_content_type=LONG_DESC_CONTENT_TYPE,
     author='Thomas Schott',
     author_email='scotty@c-base.org',
-    url='https://github.com/scotty007/dicewars',
+    url='https://codeberg.org/scotty007/dicewars',
     classifiers=CLASSIFIERS,
     python_requires='>=3.7',
     packages=PACKAGES,
