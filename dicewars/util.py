@@ -35,20 +35,20 @@ def get_player_max_size(grid_areas, player_areas):
             continue
         done_areas.append(area_idx)
         size = 1
-        areas = [
-            a_idx for a_idx in grid_areas[area_idx].neighbors
-            if a_idx in player_areas and a_idx not in done_areas
-        ]
+        areas = [a_idx for a_idx in grid_areas[area_idx].neighbors if a_idx in player_areas and a_idx not in done_areas]
         while areas:
             area_idx_ = areas.pop()
             assert area_idx_ not in done_areas
             assert area_idx_ not in areas
             done_areas.append(area_idx_)
             size += 1
-            areas.extend([
-                a_idx for a_idx in grid_areas[area_idx_].neighbors
-                if a_idx in player_areas and a_idx not in done_areas and a_idx not in areas
-            ])
+            areas.extend(
+                [
+                    a_idx
+                    for a_idx in grid_areas[area_idx_].neighbors
+                    if a_idx in player_areas and a_idx not in done_areas and a_idx not in areas
+                ]
+            )
         max_size = max(max_size, size)
     assert max_size <= len(player_areas)
     return max_size

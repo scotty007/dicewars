@@ -26,7 +26,7 @@ It was published for browsers by GAMEDESIGN (2001 for
 then ported to `JavaScript <https://www.gamedesign.jp/games/dicewars/>`_).
 
 **dicewars** implements the logic (the backend) that is required to create
-playable game GUIs (the frontends) and (multi player) game servers in Python:
+playable game GUIs (the frontends) and (multi-player) game servers in Python:
 
 * generate random hexagonal cell grids (:class:`grid.Grid`)
 * generate random match configurations (:class:`game.Game`)
@@ -55,7 +55,7 @@ A minimal frontend match loop could look like this (AI players only):
        while match.winner < 0:  # do as many attacks as the current player wishes
            attack_areas = ai_player.get_attack_areas(match.game.grid, match.state)
            if attack_areas:  # tuple of from/to area indices -> attack!
-               match.set_from_area(attack_areas[0])  # players's attacking area
+               match.set_from_area(attack_areas[0])  # players' attacking area
                match.set_to_area(attack_areas[1])  # adjacent area to attack
                match.attack()  # roll dice, result is available in match.last_attack
                if match.player_num_areas[match.last_attack.to_player] == 0:
