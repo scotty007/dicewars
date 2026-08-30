@@ -60,7 +60,6 @@ from collections import namedtuple
 from .game import Game
 from .util import get_player_max_size
 
-
 State = namedtuple(
     "State",
     "num_steps seat player winner area_players area_num_dice "
@@ -293,7 +292,7 @@ class Match:
         # internal areas/players states
         self.__area_players = list(self._game.area_seats)
         self.__area_num_dice = list(self._game.area_num_dice)
-        self.__player_areas = list(list(p_areas) for p_areas in self._game.seat_areas)
+        self.__player_areas = [list(p_areas) for p_areas in self._game.seat_areas]
         self.__player_num_areas = list(self._game.seat_num_areas)
         self.__player_max_size = list(self._game.seat_max_size)
         self.__player_num_dice = list(self._game.seat_num_dice)
@@ -629,11 +628,10 @@ class Match:
         player_idx = self.player
         num_stock = self.__player_num_stock[player_idx] + self.__player_max_size[player_idx]
         assert num_stock
-        if self.PLAYER_MAX_NUM_STOCK < num_stock:
-            num_stock = self.PLAYER_MAX_NUM_STOCK
+        num_stock = min(num_stock, self.PLAYER_MAX_NUM_STOCK)
 
         player_areas = self.__player_areas[player_idx]
-        area_supplies = dict((a_idx, 0) for a_idx in player_areas)
+        area_supplies = {a_idx: 0 for a_idx in player_areas}
         while num_stock:
             areas = [a_idx for a_idx in player_areas if self.__area_num_dice[a_idx] < self.AREA_MAX_NUM_DICE]
             if areas:

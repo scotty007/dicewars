@@ -34,7 +34,6 @@ frontend map rendering.
 import random
 from collections import namedtuple
 
-
 Cell = namedtuple("Cell", "idx grid_x grid_y area border bbox")
 r"""
 A hexagonal cell - the basic building block of each :class:`Grid`. (`namedtuple`)

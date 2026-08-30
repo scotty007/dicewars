@@ -56,7 +56,7 @@ class PassivePlayer(Player):
 
     def get_attack_areas(self, grid, match_state, *args, **kwargs):
         """:return: None"""
-        return None
+        return
 
 
 class DefaultPlayer(Player):
@@ -89,9 +89,7 @@ class DefaultPlayer(Player):
                     continue
                 to_num_dice = a_num_dice[to_area_idx]
                 assert 0 < to_num_dice
-                if from_num_dice < to_num_dice:
-                    continue
-                elif (
+                if from_num_dice < to_num_dice or (
                     from_num_dice == to_num_dice
                     and p_num_dice[from_player_idx] < max_num_dice
                     and p_num_dice[to_player_idx] < max_num_dice
