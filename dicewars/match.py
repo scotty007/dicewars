@@ -1,7 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-# Copyright (C) 2021 Thomas Schott <scotty@c-base.org>
+# Copyright (C) 2021-2026 Thomas Schott <scotty@c-base.org>
 #
 # This file is part of dicewars.
 #
@@ -60,14 +57,13 @@ are indices into the respective tuples.
 import random
 from collections import namedtuple
 
-from . game import Game
-from . util import get_player_max_size
-
+from .game import Game
+from .util import get_player_max_size
 
 State = namedtuple(
-    'State',
-    'num_steps seat player winner area_players area_num_dice '
-    'player_areas player_num_areas player_max_size player_num_dice player_num_stock'
+    "State",
+    "num_steps seat player winner area_players area_num_dice "
+    "player_areas player_num_areas player_max_size player_num_dice player_num_stock",
 )
 """
 A convenience wrapper to access the current match state data at once. (`namedtuple`)
@@ -95,13 +91,13 @@ until a (successful) call of :meth:`Match.attack` or :meth:`Match.end_turn`.
 """
 
 Attack = namedtuple(
-    'Attack',
-    'step '
-    'from_player from_area from_dice from_sum_dice '
-    'to_player to_area to_dice to_sum_dice '
-    'victory '
-    'from_area_num_dice from_player_num_areas from_player_max_size from_player_num_dice '
-    'to_area_num_dice to_player_num_areas to_player_max_size to_player_num_dice'
+    "Attack",
+    "step "
+    "from_player from_area from_dice from_sum_dice "
+    "to_player to_area to_dice to_sum_dice "
+    "victory "
+    "from_area_num_dice from_player_num_areas from_player_max_size from_player_num_dice "
+    "to_area_num_dice to_player_num_areas to_player_max_size to_player_num_dice",
 )
 """
 Information and result of an executed attack. (`namedtuple`)
@@ -218,7 +214,7 @@ Attack instances are created in :meth:`Match.attack` and available via
    .. versionadded:: 0.2.0
 """
 
-Supply = namedtuple('Supply', 'step player areas dice sum_dice area_num_dice player_num_stock')
+Supply = namedtuple("Supply", "step player areas dice sum_dice area_num_dice player_num_stock")
 """
 The outcome of dice supply at the end of a player's turn. (`namedtuple`)
 
@@ -290,13 +286,13 @@ class Match:
             self._game = Game()
         else:
             if not isinstance(game, Game):
-                raise TypeError('game must be an instance of Game')
+                raise TypeError("game must be an instance of Game")
             self._game = game
 
         # internal areas/players states
         self.__area_players = list(self._game.area_seats)
         self.__area_num_dice = list(self._game.area_num_dice)
-        self.__player_areas = list(list(p_areas) for p_areas in self._game.seat_areas)
+        self.__player_areas = [list(p_areas) for p_areas in self._game.seat_areas]
         self.__player_num_areas = list(self._game.seat_num_areas)
         self.__player_max_size = list(self._game.seat_max_size)
         self.__player_num_dice = list(self._game.seat_num_dice)
@@ -438,7 +434,7 @@ class Match:
         """
 
         if not isinstance(area_idx, int):
-            raise TypeError('area_idx must be int')
+            raise TypeError("area_idx must be int")
 
         if self._seat_idx == -1:
             return False
@@ -481,7 +477,7 @@ class Match:
         """
 
         if not isinstance(area_idx, int):
-            raise TypeError('area_idx must be int')
+            raise TypeError("area_idx must be int")
 
         if self._seat_idx == -1:
             return False
@@ -585,13 +581,23 @@ class Match:
 
         self._last_attack = Attack(
             self.num_steps,
-            from_player_idx, self._from_area_idx, from_rand_dice, from_sum_dice,
-            to_player_idx, self._to_area_idx, to_rand_dice, to_sum_dice,
+            from_player_idx,
+            self._from_area_idx,
+            from_rand_dice,
+            from_sum_dice,
+            to_player_idx,
+            self._to_area_idx,
+            to_rand_dice,
+            to_sum_dice,
             victory,
-            self.__area_num_dice[self._from_area_idx], self.__player_num_areas[from_player_idx],
-            self.__player_max_size[from_player_idx], self.__player_num_dice[from_player_idx],
-            self.__area_num_dice[self._to_area_idx], self.__player_num_areas[to_player_idx],
-            self.__player_max_size[to_player_idx], self.__player_num_dice[to_player_idx],
+            self.__area_num_dice[self._from_area_idx],
+            self.__player_num_areas[from_player_idx],
+            self.__player_max_size[from_player_idx],
+            self.__player_num_dice[from_player_idx],
+            self.__area_num_dice[self._to_area_idx],
+            self.__player_num_areas[to_player_idx],
+            self.__player_max_size[to_player_idx],
+            self.__player_num_dice[to_player_idx],
         )
         self.__history.append(self._last_attack)
         self._history = None
@@ -622,16 +628,12 @@ class Match:
         player_idx = self.player
         num_stock = self.__player_num_stock[player_idx] + self.__player_max_size[player_idx]
         assert num_stock
-        if self.PLAYER_MAX_NUM_STOCK < num_stock:
-            num_stock = self.PLAYER_MAX_NUM_STOCK
+        num_stock = min(num_stock, self.PLAYER_MAX_NUM_STOCK)
 
         player_areas = self.__player_areas[player_idx]
-        area_supplies = dict((a_idx, 0) for a_idx in player_areas)
+        area_supplies = {a_idx: 0 for a_idx in player_areas}
         while num_stock:
-            areas = [
-                a_idx for a_idx in player_areas
-                if self.__area_num_dice[a_idx] < self.AREA_MAX_NUM_DICE
-            ]
+            areas = [a_idx for a_idx in player_areas if self.__area_num_dice[a_idx] < self.AREA_MAX_NUM_DICE]
             if areas:
                 area_idx = random.choice(areas)
                 self.__area_num_dice[area_idx] += 1
@@ -646,16 +648,16 @@ class Match:
         self._player_num_stock = tuple(self.__player_num_stock)
 
         area_supplies = tuple(
-            (a_idx, n_dice, self.__area_num_dice[a_idx])
-            for a_idx, n_dice in area_supplies.items() if n_dice
+            (a_idx, n_dice, self.__area_num_dice[a_idx]) for a_idx, n_dice in area_supplies.items() if n_dice
         )
         self._last_supply = Supply(
-            self.num_steps, player_idx,
+            self.num_steps,
+            player_idx,
             tuple(area_supply[0] for area_supply in area_supplies),
             tuple(area_supply[1] for area_supply in area_supplies),
             sum(area_supply[1] for area_supply in area_supplies),
             tuple(area_supply[2] for area_supply in area_supplies),
-            num_stock
+            num_stock,
         )
         self.__history.append(self._last_supply)
         self._history = None
@@ -675,8 +677,15 @@ class Match:
 
     def _update_state(self):
         self._state = State(
-            self.num_steps, self._seat_idx, self.player, self._winner,
-            self._area_players, self._area_num_dice,
-            self._player_areas, self._player_num_areas, self._player_max_size,
-            self._player_num_dice, self._player_num_stock
+            self.num_steps,
+            self._seat_idx,
+            self.player,
+            self._winner,
+            self._area_players,
+            self._area_num_dice,
+            self._player_areas,
+            self._player_num_areas,
+            self._player_max_size,
+            self._player_num_dice,
+            self._player_num_stock,
         )

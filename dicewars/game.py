@@ -1,7 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-# Copyright (C) 2021 Thomas Schott <scotty@c-base.org>
+# Copyright (C) 2021-2026 Thomas Schott <scotty@c-base.org>
 #
 # This file is part of dicewars.
 #
@@ -35,8 +32,8 @@ runnable :class:`~dicewars.match.Match` instances.
 
 import random
 
-from . grid import Grid
-from . util import get_player_max_size
+from .grid import Grid
+from .util import get_player_max_size
 
 
 class Game:
@@ -62,17 +59,17 @@ class Game:
             self._grid = Grid()
         else:
             if not isinstance(grid, Grid):
-                raise TypeError('grid must be an instance of Grid')
+                raise TypeError("grid must be an instance of Grid")
             self._grid = grid
 
         num_areas = len(self._grid.areas)
 
         if not isinstance(num_seats, int):
-            raise TypeError('num_seats must be int')
+            raise TypeError("num_seats must be int")
         if num_seats < 1:
-            raise ValueError('num_seats must be > 0')
+            raise ValueError("num_seats must be > 0")
         if num_areas < num_seats:
-            raise ValueError(f'num_seats must be <= grid.num_areas={num_areas}')
+            raise ValueError(f"num_seats must be <= grid.num_areas={num_areas}")
 
         seat_random_order = [s_idx for s_idx in range(num_seats)]
 
@@ -94,7 +91,8 @@ class Game:
         for _ in range(num_areas * 2):
             seat_idx = seat_random_order[random_idx]
             areas = [
-                a_idx for a_idx in range(num_areas)
+                a_idx
+                for a_idx in range(num_areas)
                 if self._area_seats[a_idx] == seat_idx and self._area_num_dice[a_idx] < self.AREA_MAX_NUM_DICE
             ]
             if areas:
@@ -106,18 +104,16 @@ class Game:
 
         # seat status calculations
         self._seat_areas = tuple(
-            tuple(a_idx for a_idx in range(num_areas) if self._area_seats[a_idx] == s_idx)
-            for s_idx in range(num_seats)
+            tuple(a_idx for a_idx in range(num_areas) if self._area_seats[a_idx] == s_idx) for s_idx in range(num_seats)
         )
         self._seat_num_areas = tuple(len(s_areas) for s_areas in self._seat_areas)
         self._seat_max_size = tuple(
-            get_player_max_size(self._grid.areas, self._seat_areas[seat_idx])
-            for seat_idx in range(num_seats)
+            get_player_max_size(self._grid.areas, self._seat_areas[seat_idx]) for seat_idx in range(num_seats)
         )
         self._seat_num_dice = tuple(
-            sum(s_dice) for s_dice in (
-                (self._area_num_dice[a_idx] for a_idx in self._seat_areas[s_idx])
-                for s_idx in range(num_seats)
+            sum(s_dice)
+            for s_dice in (
+                (self._area_num_dice[a_idx] for a_idx in self._seat_areas[s_idx]) for s_idx in range(num_seats)
             )
         )
 

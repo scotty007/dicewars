@@ -1,7 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-# Copyright (C) 2021 Thomas Schott <scotty@c-base.org>
+# Copyright (C) 2021-2026 Thomas Schott <scotty@c-base.org>
 #
 # This file is part of dicewars.
 #
@@ -51,7 +48,7 @@ class Player:
         :rtype: tuple(int, int) or None
         """
 
-        raise NotImplementedError(f'{self.__class__} get_attack_areas()')
+        raise NotImplementedError(f"{self.__class__.__name__} get_attack_areas()")
 
 
 class PassivePlayer(Player):
@@ -59,7 +56,7 @@ class PassivePlayer(Player):
 
     def get_attack_areas(self, grid, match_state, *args, **kwargs):
         """:return: None"""
-        return None
+        return
 
 
 class DefaultPlayer(Player):
@@ -92,12 +89,12 @@ class DefaultPlayer(Player):
                     continue
                 to_num_dice = a_num_dice[to_area_idx]
                 assert 0 < to_num_dice
-                if from_num_dice < to_num_dice:
-                    continue
-                elif from_num_dice == to_num_dice and \
-                        p_num_dice[from_player_idx] < max_num_dice and \
-                        p_num_dice[to_player_idx] < max_num_dice and \
-                        random.random() < 0.5:
+                if from_num_dice < to_num_dice or (
+                    from_num_dice == to_num_dice
+                    and p_num_dice[from_player_idx] < max_num_dice
+                    and p_num_dice[to_player_idx] < max_num_dice
+                    and random.random() < 0.5
+                ):
                     continue
                 attack_areas.append((from_area_idx, to_area_idx))
 

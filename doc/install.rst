@@ -17,7 +17,7 @@ Preferably in a Python virtual env, run:
 From source
 -----------
 
-Get the `source code <https://github.com/scotty007/dicewars>`_.
+Get the `source code <https://codeberg.org/scotty007/dicewars>`_.
 
 Inside the top-level source directory (and preferably in a Python
 virtual env), run:
@@ -25,12 +25,6 @@ virtual env), run:
 .. code-block::
 
    $ pip install .
-
-or
-
-.. code-block::
-
-   $ python setup.py install
 
 
 Documentation

@@ -1,7 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-# Copyright (C) 2021 Thomas Schott <scotty@c-base.org>
+# Copyright (C) 2021-2026 Thomas Schott <scotty@c-base.org>
 #
 # This file is part of dicewars.
 #
@@ -37,8 +34,7 @@ frontend map rendering.
 import random
 from collections import namedtuple
 
-
-Cell = namedtuple('Cell', 'idx grid_x grid_y area border bbox')
+Cell = namedtuple("Cell", "idx grid_x grid_y area border bbox")
 r"""
 A hexagonal cell - the basic building block of each :class:`Grid`. (`namedtuple`)
 
@@ -80,7 +76,7 @@ frontends.
    coordinates of the cell's bounding box on the map.
 """
 
-Area = namedtuple('Area', 'idx cells neighbors center border bbox')
+Area = namedtuple("Area", "idx cells neighbors center border bbox")
 r"""
 A group of adjacent :class:`Cell`\s in a :class:`Grid`. (`namedtuple`)
 
@@ -133,8 +129,11 @@ class Grid:
     """Default for the ``min_area_size`` parameter. (`int`)"""
 
     def __init__(
-        self, grid_width=DEFAULT_GRID_WIDTH, grid_height=DEFAULT_GRID_HEIGHT,
-        max_num_areas=DEFAULT_MAX_NUM_AREAS, min_area_size=DEFAULT_MIN_AREA_SIZE
+        self,
+        grid_width=DEFAULT_GRID_WIDTH,
+        grid_height=DEFAULT_GRID_HEIGHT,
+        max_num_areas=DEFAULT_MAX_NUM_AREAS,
+        min_area_size=DEFAULT_MIN_AREA_SIZE,
     ):
         r"""
         Generate a grid and assign :class:`Cell`\s to :class:`Area`\s.
@@ -153,25 +152,25 @@ class Grid:
 
         # TODO: upper param bounds?
         if not isinstance(grid_width, int):
-            raise TypeError('grid_width must be int')
+            raise TypeError("grid_width must be int")
         if grid_width < 1:
-            raise ValueError('grid_width must be > 0')
+            raise ValueError("grid_width must be > 0")
         if not isinstance(grid_height, int):
-            raise TypeError('grid_height must be int')
+            raise TypeError("grid_height must be int")
         if grid_height < 1:
-            raise ValueError('grid_height must be > 0')
+            raise ValueError("grid_height must be > 0")
         if not isinstance(max_num_areas, int):
-            raise TypeError('max_num_areas must be int')
+            raise TypeError("max_num_areas must be int")
         if max_num_areas < 1:
-            raise ValueError('max_num_areas must be > 0')
+            raise ValueError("max_num_areas must be > 0")
         if not isinstance(min_area_size, int):
-            raise TypeError('min_area_size must be int')
+            raise TypeError("min_area_size must be int")
         if min_area_size < 1:
-            raise ValueError('min_area_size must be > 0')
+            raise ValueError("min_area_size must be > 0")
 
         num_cells = grid_width * grid_height
         if num_cells < min_area_size:
-            raise ValueError(f'min_area_size must be <= (grid_width * grid_height)={num_cells}')
+            raise ValueError(f"min_area_size must be <= (grid_width * grid_height)={num_cells}")
 
         cells = [_Cell(c_idx, grid_width) for c_idx in range(num_cells)]
         for cell in cells:
@@ -241,10 +240,17 @@ class Grid:
             map_w = cells[-1].bbox[1][0]
         self._map_size = (map_w, cells[-1].bbox[1][1])
         self._cells = tuple(Cell(c.idx, c.grid_x, c.grid_y, c.area_idx, c.border, c.bbox) for c in cells)
-        self._areas = tuple(Area(
-            a.idx, tuple(c.idx for c in a.cells), tuple(n.idx for n in a.neighbors),
-            a.center_cell.idx, a.border, a.bbox
-        ) for a in areas)
+        self._areas = tuple(
+            Area(
+                a.idx,
+                tuple(c.idx for c in a.cells),
+                tuple(n.idx for n in a.neighbors),
+                a.center_cell.idx,
+                a.border,
+                a.bbox,
+            )
+            for a in areas
+        )
 
     @property
     def grid_size(self):
@@ -278,10 +284,11 @@ class Grid:
         grid_w, grid_h = self.grid_size
         for y in range(grid_h):
             row, cells = cells[:grid_w], cells[grid_w:]
-            print(f'{" " * (y % 2)}{" ".join(f"{c.area:02d}" if c.area != -1 else "--" for c in row)}')
+            print(f"{' ' * (y % 2)}{' '.join(f'{c.area:02d}' if c.area != -1 else '--' for c in row)}")
 
 
 # _Cell/_Area objects internally used for grid generation, then dropped #
+
 
 class _Cell:
     # border points (counter-clockwise, 5x5 raster, starting at top center)
@@ -332,7 +339,7 @@ class _Area:
         # find neighbor areas and center cell
         cx = (min(cell.grid_x for cell in self.cells) + max(cell.grid_x for cell in self.cells)) // 2
         cy = (min(cell.grid_y for cell in self.cells) + max(cell.grid_y for cell in self.cells)) // 2
-        dist_min = float('inf')
+        dist_min = float("inf")
         start_edge = None
         for cell in self.cells:
             dist = 0
@@ -355,7 +362,7 @@ class _Area:
 
         # find border points (counter-clockwise) and bounding box
         assert start_edge
-        x_min, y_min, x_max, y_max = float('inf'), float('inf'), -1, -1
+        x_min, y_min, x_max, y_max = float("inf"), float("inf"), -1, -1
         cell, dir_ = start_edge
         while True:
             point = cell.border[dir_]
