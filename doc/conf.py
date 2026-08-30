@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'dicewars'
-copyright = '2021, Thomas Schott'
+copyright = '2021-2026, Thomas Schott'
 author = 'Thomas Schott'
 
 # The full version, including alpha/beta/rc tags

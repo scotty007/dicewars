@@ -26,12 +26,6 @@ virtual env), run:
 
    $ pip install .
 
-or
-
-.. code-block::
-
-   $ python setup.py install
-
 
 Documentation
 -------------
