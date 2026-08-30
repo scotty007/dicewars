@@ -1,7 +1,4 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-# Copyright (C) 2021 Thomas Schott <scotty@c-base.org>
+# Copyright (C) 2021-2026 Thomas Schott <scotty@c-base.org>
 #
 # This file is part of dicewars.
 #
