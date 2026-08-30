@@ -1,5 +1,8 @@
 # dicewars #
 
+> *This repository is a public mirror.*
+> *All development is happening on [Codeberg](https://codeberg.org/scotty007/dicewars).*
+
 DiceWars is a (quite addictive) quick game, inspired by the
 [Risk](https://en.wikipedia.org/wiki/Risk_(game)) board game.
 It mixes strategy and luck, the objective is to conquer all areas on a
