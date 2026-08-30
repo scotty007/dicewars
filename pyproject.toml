@@ -1,0 +1,29 @@
+[project]
+name = "dicewars"
+description = "Backend for DiceWars games/servers"
+readme = "README.md"
+authors = [
+    {name = "Thomas Schott", email = "scotty@c-base.org"},
+]
+license = "GPL-3.0-or-later"
+license-files = ["COPYING"]
+dynamic = ["version"]
+requires-python = ">=3.10"
+classifiers = [
+    "Topic :: Games/Entertainment :: Board Games",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Development Status :: 4 - Beta",
+]
+
+[project.urls]
+Homepage = "https://codeberg.org/scotty007/dicewars"
+Documentation = "https://dicewars.readthedocs.io"
+
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = {attr = "dicewars.__version__.__version__"}
